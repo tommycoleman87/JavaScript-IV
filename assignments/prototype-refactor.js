@@ -26,15 +26,17 @@ Prototype Refactor
   * destroy() // prototype method that returns: `${this.name} was removed from the game.`
 */
 
-function GameObject(params) {
-    this.createdAt = params.createdAt;
-    this.name = params.name;
-    this.dimensions = params.dimensions;
+class GameObject {
+    constructor(params){
+        this.createdAt = params.createdAt;
+        this.name = params.name;
+        this.dimensions = params.dimensions;
   }
-  
-  GameObject.prototype.destroy = function () {
+
+  destroy() {
     return `${this.name} was removed from the game.`;
-  };
+  }
+}
   
   /*
     === CharacterStats ===
@@ -42,18 +44,19 @@ function GameObject(params) {
     * takeDamage() // prototype method -> returns the string '<object name> took damage.'
     * should inherit destroy() from GameObject's prototype
   */
-  CharacterStats.prototype = Object.create(GameObject.prototype);
-  
-  function CharacterStats(params) {
-    GameObject.call(this, params);
-    this.healthPoints = params.healthPoints;
+
+  class CharacterStats extends GameObject {
+      constructor(params){
+          super(params);
+          this.healthPoints = params.healthPoints;
   }
-  
-  CharacterStats.prototype.takeDamage = function () {
+
+  takeDamage() {
     return `${this.name} took dammage.`;
-  };
-  
-  /*
+  }
+
+}
+   /*
     === Humanoid (Having an appearance or character resembling that of a human.) ===
     * team
     * weapons
@@ -62,118 +65,133 @@ function GameObject(params) {
     * should inherit destroy() from GameObject through CharacterStats
     * should inherit takeDamage() from CharacterStats
   */
-  Humanoid.prototype = Object.create(CharacterStats.prototype);
-  function Humanoid(params) {
-    CharacterStats.call(this, params);
-    this.team = params.team;
-    this.weapons = params.weapons;
-    this.language = params.language;
+  
+  class Humanoid extends CharacterStats {
+      constructor(params){
+          super(params);
+        this.team = params.team;
+        this.weapons = params.weapons;
+        this.language = params.language;
+      }
+
+      greet() {
+        return `${this.name} offers a greeting in ${this.language}`;
+      }
   }
   
-  Humanoid.prototype.greet = function () {
-    return `${this.name} offers a greeting in ${this.language}`;
-  };
+
   
-  Villain.prototype = Object.create(Humanoid.prototype);
-  function Villain(params) {
-    Humanoid.call(this, params);
-    this.type = params.type;
-  }
   
-  Villain.prototype.psychicBlast = function (target) {
-    let dmg = Math.floor(Math.random() * 11);
-    let drain = Math.floor(Math.random() * 5);
-    if (this.healthPoints < 1) {
-      return "Can' attack, I'm dead";
-    } else if (dmg === 0) { return 'Psychic Blast missed' }
-    else if (target.healthPoints < 1) {
-      return `Can't target ${target.name}. They are food for the worms`;
-    } else if (target.healthPoints <= dmg) {
-      target.healthPoints = 0;
-      if (Math.floor(Math.random() * 11) > 6) {
-        this.healthPoints -= drain;
+  class Villain extends Humanoid{
+      constructor(params){
+          super(params);
+          this.type = params.type;
+      }
+
+      psychicBlast(target) {
+        let dmg = Math.floor(Math.random() * 11);
+        let drain = Math.floor(Math.random() * 5);
         if (this.healthPoints < 1) {
-          return `Psychic blast does ${dmg} damage to ${target.name}. ${
-            this.name
-            } is drained and does ${drain} to themselves. ${target.takeDamage()} Killing blow! ${target.destroy()}. ${this.takeDamage()} ${this.destroy()}`;
+          return "Can' attack, I'm dead";
+        } else if (dmg === 0) { return 'Psychic Blast missed' }
+        else if (target.healthPoints < 1) {
+          return `Can't target ${target.name}. They are food for the worms`;
+        } else if (target.healthPoints <= dmg) {
+          target.healthPoints = 0;
+          if (Math.floor(Math.random() * 11) > 6) {
+            this.healthPoints -= drain;
+            if (this.healthPoints < 1) {
+              return `Psychic blast does ${dmg} damage to ${target.name}. ${
+                this.name
+                } is drained and does ${drain} to themselves. ${target.takeDamage()} Killing blow! ${target.destroy()}. ${this.takeDamage()} ${this.destroy()}`;
+            } else {
+              return `Psychic blast does ${dmg} damage to ${target.name}. ${
+                this.name
+                } is drained and does ${drain} damage to themselves. ${target.takeDamage()} Killing blow! ${target.destroy()} ${this.takeDamage()}. ${this.name} has ${this.healthPoints} health left`;
+            }
+          } else {
+            return `Psychic blast does ${dmg} damage to ${
+              target.name
+              }. ${target.takeDamage()} Killing blow! ${target.destroy()}`;
+          }
         } else {
-          return `Psychic blast does ${dmg} damage to ${target.name}. ${
-            this.name
-            } is drained and does ${drain} damage to themselves. ${target.takeDamage()} Killing blow! ${target.destroy()} ${this.takeDamage()}. ${this.name} has ${this.healthPoints} health left`;
+          target.healthPoints = target.healthPoints - dmg;
+          if (Math.floor(Math.random() * 11) > 6) {
+            if (target.healthPoints < 1) {
+              this.healthPoints -= drain;
+              return `PsychicBlast does ${dmg} damage to ${target.name}. ${
+                this.name
+                } is drained and does ${drain} damage to themselves.${target.takeDamage()} ${target.destroy()} ${this.takeDamage()} ${this.name} has ${this.healthPoints} health left.`;
+            } else {
+              this.healthPoints -= drain;
+              return `PsychicBlast does ${dmg} damage to ${target.name}. ${
+                this.name
+                } is drained and does ${drain} damage to themselves. ${target.takeDamage()} ${
+                target.name
+                } has ${target.healthPoints} health left. ${this.takeDamage()} ${this.name} has ${this.healthPoints} health left.`;
+            }
+          } else {
+            if (target.healthPoints < 1) {
+              return `PsychicBlast does ${dmg} to ${
+                target.name
+                }. ${target.takeDamage()} ${target.destroy()}`;
+            } else {
+              return `PsychicBlast does ${dmg} to ${target.name}. ${target.takeDamage()} ${
+                target.name
+                } has ${target.healthPoints} health left`;
+            }
+          }
         }
-      } else {
-        return `Psychic blast does ${dmg} damage to ${
-          target.name
-          }. ${target.takeDamage()} Killing blow! ${target.destroy()}`;
-      }
-    } else {
-      target.healthPoints = target.healthPoints - dmg;
-      if (Math.floor(Math.random() * 11) > 6) {
-        if (target.healthPoints < 1) {
-          this.healthPoints -= drain;
-          return `PsychicBlast does ${dmg} damage to ${target.name}. ${
-            this.name
-            } is drained and does ${drain} damage to themselves.${target.takeDamage()} ${target.destroy()} ${this.takeDamage()} ${this.name} has ${this.healthPoints} health left.`;
-        } else {
-          this.healthPoints -= drain;
-          return `PsychicBlast does ${dmg} damage to ${target.name}. ${
-            this.name
-            } is drained and does ${drain} damage to themselves. ${target.takeDamage()} ${
-            target.name
-            } has ${target.healthPoints} health left. ${this.takeDamage()} ${this.name} has ${this.healthPoints} health left.`;
-        }
-      } else {
-        if (target.healthPoints < 1) {
-          return `PsychicBlast does ${dmg} to ${
-            target.name
-            }. ${target.takeDamage()} ${target.destroy()}`;
-        } else {
-          return `PsychicBlast does ${dmg} to ${target.name}. ${target.takeDamage()} ${
-            target.name
-            } has ${target.healthPoints} health left`;
-        }
-      }
-    }
-  };
-  
-  Hero.prototype = Object.create(Humanoid.prototype);
-  
-  function Hero(params) {
-    Humanoid.call(this, params);
-    this.type = params.type;
+      };
+    
+    
   }
   
-  Hero.prototype.smite = function (target) {
-    let dmg = Math.floor(Math.random() * 5);
-    let heal = Math.round(dmg / 2);
-    if (this.healthPoints < 1) {
-      return "Can' attack, I'm dead";
-    } else if (target.healthPoints < 1) {
-      return `Can't attack ${target.name}. They have already perished`;
-    } else if (dmg === 0) {
-      return `Smite missed`;
-    } else if (target.healthPoints <= dmg) {
-      target.healthPoints = 0;
-      this.healthPoints += heal;
-      return `Smite does ${dmg} damage to ${target.name}. ${
-        this.name
-        } heals for ${heal} health. ${target.takeDamage()} Killing blow! ${target.destroy()}`;
-    } else {
-      target.healthPoints = target.healthPoints - dmg;
-      this.healthPoints += heal;
-      if (target.healthPoints < 1) {
-        return `Smite does ${dmg} damage to ${target.name}. ${
-          this.name
-          } heals for ${heal} health. ${target.takeDamage()} ${target.destroy()}`;
-      } else {
-        return `Smite does ${dmg} damage to ${target.name}. ${
-          this.name
-          } heals for ${heal} health. ${target.takeDamage()} ${target.name} has ${
-          target.healthPoints
-          } health left`;
-      }
+  
+  
+  
+  
+  class Hero extends Humanoid {
+    constructor(params) {
+        super(params);
+        this.type = params.type;
     }
-  };
+
+    smite(target) {
+        let dmg = Math.floor(Math.random() * 5);
+        let heal = Math.round(dmg / 2);
+        if (this.healthPoints < 1) {
+        return "Can' attack, I'm dead";
+        } else if (target.healthPoints < 1) {
+        return `Can't attack ${target.name}. They have already perished`;
+        } else if (dmg === 0) {
+        return `Smite missed`;
+        } else if (target.healthPoints <= dmg) {
+        target.healthPoints = 0;
+        this.healthPoints += heal;
+        return `Smite does ${dmg} damage to ${target.name}. ${
+            this.name
+            } heals for ${heal} health. ${target.takeDamage()} Killing blow! ${target.destroy()}`;
+        } else {
+        target.healthPoints = target.healthPoints - dmg;
+        this.healthPoints += heal;
+        if (target.healthPoints < 1) {
+            return `Smite does ${dmg} damage to ${target.name}. ${
+            this.name
+            } heals for ${heal} health. ${target.takeDamage()} ${target.destroy()}`;
+        } else {
+            return `Smite does ${dmg} damage to ${target.name}. ${
+            this.name
+            } heals for ${heal} health. ${target.takeDamage()} ${target.name} has ${
+            target.healthPoints
+            } health left`;
+        }
+        }
+    }
+    
+  }
+  
+       
   /*
    * Inheritance chain: GameObject -> CharacterStats -> Humanoid
    * Instances of Humanoid should have all of the same properties as CharacterStats and GameObject.
@@ -254,7 +272,7 @@ function GameObject(params) {
     type: "Hero"
   });
   
-  /*console.log(mage.createdAt); // Today's date
+  console.log(mage.createdAt); // Today's date
   console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
   console.log(swordsman.healthPoints); // 15
   console.log(mage.name); // Bruce
