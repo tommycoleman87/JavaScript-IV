@@ -29,12 +29,21 @@ class Instructor extends Person {
     }
 
     numGrade(student){
-        let masYMenos = Math.floor(Math.random() * 100);
-        let gradeAugment = Math.floor(Math.random() * 10);
+        let masYMenos = Math.floor(Math.random() * 100) + 1;
+        let gradeAugment = Math.floor(Math.random() * 10) + 1;
         switch(masYMenos % 2 === 0) {
             case true:
                 student.grade += gradeAugment;
-                return `${this.name} has given ${student.name} ${gradeAugment} points to their grade`;
+                switch(student.grade < 100){
+                    case true:
+                            return `${this.name} has given ${student.name} ${gradeAugment} points to their grade`;
+                            break;
+                    case false: 
+                    student.grade = 100;
+                    return `${this.name} has given ${student.name} ${gradeAugment} points to their grade but ${student.name} already has a ${student.grade}`;
+                    break;
+                }
+                
                 break;
             case false:
                 student.grade -= gradeAugment;
@@ -55,7 +64,7 @@ class Student extends Person {
     }
 
     listsSubjects() {
-         this.favSubjects.forEach(favSub => console.log(favSub));
+         return this.favSubjects.forEach(favSub => console.log(favSub));
     }
 
     PRAssignment(subject){
@@ -164,6 +173,13 @@ const mary = new ProjectManager({
     favInstructor: 'Dan Levy'
 })
 
-console.log(dan.numGrade(kevin));
+console.log(dan.numGrade(may));
+console.log(may.grade);
+console.log(may.graduate());
+console.log(amir.numGrade(tommy));
+console.log(tommy.grade);
+console.log(tommy.graduate());
+console.log(josh.numGrade(kevin));
 console.log(kevin.grade);
 console.log(kevin.graduate());
+console.log(mary.speak());
