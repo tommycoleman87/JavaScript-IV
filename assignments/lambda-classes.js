@@ -30,15 +30,16 @@ class Instructor extends Person {
 
     numGrade(student){
         let masYMenos = Math.floor(Math.random() * 100);
-        console.log(masYMenos);
         let gradeAugment = Math.floor(Math.random() * 10);
-        console.log(gradeAugment);
-        if(masYMenos % 2 === 0) {
-           student.grade += gradeAugment;
-           return `${this.name} has given ${student.name} ${gradeAugment} points to their grade`
-        } else {
-            student.grade -= gradeAugment;
-            return `${this.name} has taken  ${gradeAugment} points from ${student.name}'s grade`
+        switch(masYMenos % 2 === 0) {
+            case true:
+                student.grade += gradeAugment;
+                return `${this.name} has given ${student.name} ${gradeAugment} points to their grade`;
+                break;
+            case false:
+                student.grade -= gradeAugment;
+                return `${this.name} has taken  ${gradeAugment} points from ${student.name}'s grade`;
+                break;
         }
     }
 
@@ -66,10 +67,13 @@ class Student extends Person {
     }
 
     graduate(){
-        if(this.grade < 71) {
-          return `${this.name} has failed. Study up and try again`  
-        } else {
+        switch(this.grade < 71) {
+            case true: 
+            return `${this.name} has failed. Study up and try again`;
+            break;
+            case false: 
             return `${this.name} has passed! ${this.name} graduates!`;
+            break;
         }
     }
 }
