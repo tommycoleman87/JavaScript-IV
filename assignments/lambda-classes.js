@@ -27,6 +27,21 @@ class Instructor extends Person {
     grade(student, subject){
         return `${student.name} recieves a perfect score on ${subject}.`
     }
+
+    numGrade(student){
+        let masYMenos = Math.floor(Math.random() * 100);
+        console.log(masYMenos);
+        let gradeAugment = Math.floor(Math.random() * 10);
+        console.log(gradeAugment);
+        if(masYMenos % 2 === 0) {
+           student.grade += gradeAugment;
+           return `${this.name} has given ${student.name} ${gradeAugment} points to their grade`
+        } else {
+            student.grade -= gradeAugment;
+            return `${this.name} has taken  ${gradeAugment} points from ${student.name}'s grade`
+        }
+    }
+
 }
 
 class Student extends Person {
@@ -35,6 +50,7 @@ class Student extends Person {
         this.previousBackground = studentAttrs.previousBackground;
         this.className = studentAttrs.className;
         this.favSubjects = studentAttrs.favSubjects;
+        this.grade = studentAttrs.grade;
     }
 
     listsSubjects() {
@@ -47,6 +63,14 @@ class Student extends Person {
 
     sprintChallenge(subject){
         return `${this.name} has begun sprint challenge of ${subject}.`
+    }
+
+    graduate(){
+        if(this.grade < 71) {
+          return `${this.name} has failed. Study up and try again`  
+        } else {
+            return `${this.name} has passed! ${this.name} graduates!`;
+        }
     }
 }
 
@@ -72,7 +96,8 @@ const tommy = new Student({
     location: 'Florida',
     previousBackground: 'Html, CSS, and a small amount of JavaScript.',
     className: 'CS21',
-    favSubjects: ['CSS', 'JavaScript', 'Python']
+    favSubjects: ['CSS', 'JavaScript', 'Python'],
+    grade: 100
 })
 
 const may = new Student({
@@ -81,7 +106,8 @@ const may = new Student({
     location: 'Washington',
     previousBackground: 'Being an extrovert.',
     className: 'CS21',
-    favSubjects: ['CSS', 'JavaScript', 'Python', 'Debugging']
+    favSubjects: ['CSS', 'JavaScript', 'Python', 'Debugging'],
+    grade: 95
 })
 
 const kevin = new Student({
@@ -90,7 +116,8 @@ const kevin = new Student({
     location: 'Azeroth',
     previousBackground: 'Slaying noobs',
     className: 'CS21',
-    favSubjects: ['CSS', 'JavaScript', 'Python', 'Debugging', 'League of Legends 101']
+    favSubjects: ['CSS', 'JavaScript', 'Python', 'Debugging', 'League of Legends 101'],
+    grade: 65
 })
 
 const dan = new Instructor({
@@ -133,4 +160,6 @@ const mary = new ProjectManager({
     favInstructor: 'Dan Levy'
 })
 
-console.log(may.speak());
+console.log(dan.numGrade(kevin));
+console.log(kevin.grade);
+console.log(kevin.graduate());
